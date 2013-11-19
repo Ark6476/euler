@@ -13,20 +13,15 @@
       (is-a-prime (rest primes) number))))
   
 ;Assumes the list is a sorted list of primes
-(defun compute-next-prime (primes)
-  (if (eq primes nil)
-    (list 2) ;1 isn't a prime number so don't even think about it
-    (compute-next-prime-helper primes (+ (first (last primes)) 1))))
-
-(defun compute-next-prime-helper (primes number-to-try)
+(defun compute-next-prime (&optional (primes '(2)) (number-to-try (+ 1 (first (last primes)))))
   (if (is-a-prime primes number-to-try)
     (append primes (list number-to-try))
-    (compute-next-prime-helper primes (+ 1 number-to-try))))
+    (compute-next-prime primes (+ 1 number-to-try))))
 
-(defun compute-all-primes-below (end primes)
-  (if (or (eq nil primes) (< (first (last primes)) end))
+(defun compute-all-primes-below (end &optional (primes (compute-next-prime)))
+  (if (< (first (last primes)) end)
     (compute-all-primes-below end (compute-next-prime primes))
-    primes))
+    (subseq primes 0 (- (list-length primes) 1))))
 
 (defun reduce-num (number aprime)
   (if (is-a-factor number aprime)
@@ -41,12 +36,13 @@
   
 ;Returns a list of all primes calculated and a subset of that list which contains the prime factors for number
 (defun get-prime-factors (number &optional (primes (compute-next-prime nil)) factors nonfactors)
+  (let ((reduced 0))
   (dolist (prime (list-minus primes factors nonfactors))
     (setf reduced (reduce-num number prime))
     (if (= reduced number)
       (setf nonfactors(append nonfactors (list prime)))
       (setf factors (append factors (list prime))))
-    (setf number reduced))
+    (setf number reduced)))
   ;(format t "number is now ~d~%" number)
   (if (= 1 number)
     (list primes factors)

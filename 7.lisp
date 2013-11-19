@@ -1,4 +1,4 @@
-(require "3.lisp")
+(load (compile-file "3.lisp"))
  
 (defun compute-nth-prime (n &optional primes)
   (if (<= n (list-length primes))
